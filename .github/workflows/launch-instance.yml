@@ -1,3 +1,10 @@
+name: Launch OCI ARM Instance
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/10 * * * *'
+
 env:
   OCI_SHAPE: VM.Standard.A1.Flex
   OCI_OCPUS: 2
@@ -7,3 +14,34 @@ env:
   OCI_AVAILABILITY_DOMAIN: ""
   OCI_FAULT_DOMAIN: ""
   OCI_DISPLAY_NAME: erp-dev
+
+jobs:
+  launch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+
+      - name: Install dependencies
+        run: composer install --no-progress --prefer-dist
+
+      - name: Launch instance
+        run: php run.php
+        env:
+          OCI_TENANCY_ID: ${{ secrets.OCI_TENANCY_ID }}
+          OCI_USER_ID: ${{ secrets.OCI_USER_ID }}
+          OCI_KEY_FINGERPRINT: ${{ secrets.OCI_KEY_FINGERPRINT }}
+          OCI_PRIVATE_KEY: ${{ secrets.OCI_PRIVATE_KEY }}
+          OCI_REGION: ${{ secrets.OCI_REGION }}
+          OCI_SHAPE: ${{ env.OCI_SHAPE }}
+          OCI_OCPUS: ${{ env.OCI_OCPUS }}
+          OCI_MEMORY_IN_GBS: ${{ env.OCI_MEMORY_IN_GBS }}
+          OCI_SUBNET_ID: ${{ env.OCI_SUBNET_ID }}
+          OCI_IMAGE_ID: ${{ env.OCI_IMAGE_ID }}
+          OCI_AVAILABILITY_DOMAIN: ${{ env.OCI_AVAILABILITY_DOMAIN }}
+          OCI_FAULT_DOMAIN: ${{ env.OCI_FAULT_DOMAIN }}
+          OCI_DISPLAY_NAME: ${{ env.OCI_DISPLAY_NAME }}
