@@ -30,18 +30,18 @@ jobs:
         run: composer install --no-progress --prefer-dist
 
       - name: Launch instance
-        run: php run.php
+        run: php index.php
         env:
           OCI_TENANCY_ID: ${{ secrets.OCI_TENANCY_ID }}
           OCI_USER_ID: ${{ secrets.OCI_USER_ID }}
           OCI_KEY_FINGERPRINT: ${{ secrets.OCI_KEY_FINGERPRINT }}
           OCI_PRIVATE_KEY: ${{ secrets.OCI_PRIVATE_KEY }}
           OCI_REGION: ${{ secrets.OCI_REGION }}
+          OCI_SSH_PUBLIC_KEY: ${{ secrets.OCI_SSH_PUBLIC_KEY }}
           OCI_SHAPE: ${{ env.OCI_SHAPE }}
           OCI_OCPUS: ${{ env.OCI_OCPUS }}
           OCI_MEMORY_IN_GBS: ${{ env.OCI_MEMORY_IN_GBS }}
           OCI_SUBNET_ID: ${{ env.OCI_SUBNET_ID }}
           OCI_IMAGE_ID: ${{ env.OCI_IMAGE_ID }}
           OCI_AVAILABILITY_DOMAIN: ${{ env.OCI_AVAILABILITY_DOMAIN }}
-          OCI_FAULT_DOMAIN: ${{ env.OCI_FAULT_DOMAIN }}
           OCI_DISPLAY_NAME: ${{ env.OCI_DISPLAY_NAME }}
