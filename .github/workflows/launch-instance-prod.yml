@@ -1,0 +1,51 @@
+name: Launch OCI ARM Instance PROD
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/10 * * * *'
+
+env:
+  OCI_SHAPE: VM.Standard.A1.Flex
+  OCI_OCPUS: 2
+  OCI_MEMORY_IN_GBS: 12
+  OCI_SUBNET_ID: ocid1.subnet.oc1.eu-frankfurt-1.aaaaaaaahikvz2nuwrfc7inngq7sznwq2alhutp54o3hb7z24wn572vxlqhq
+  OCI_IMAGE_ID: ocid1.image.oc1.eu-frankfurt-1.aaaaaaaapli4odzd45utz5wtjkqiu5xzzu5kkcwlgvljxuf6qbgytl26hxza
+  OCI_AVAILABILITY_DOMAIN: ""
+  OCI_DISPLAY_NAME: erp-prod
+
+jobs:
+  launch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+
+      - name: Install dependencies
+        run: composer install --no-progress --prefer-dist
+
+      - name: Write private key to file
+        run: |
+          echo "${{ secrets.OCI_PRIVATE_KEY }}" > /tmp/oci_private_key.pem
+          chmod 600 /tmp/oci_private_key.pem
+
+      - name: Launch instance
+        run: php index.php
+        env:
+          OCI_TENANCY_ID: ${{ secrets.OCI_TENANCY_ID }}
+          OCI_USER_ID: ${{ secrets.OCI_USER_ID }}
+          OCI_KEY_FINGERPRINT: ${{ secrets.OCI_KEY_FINGERPRINT }}
+          OCI_PRIVATE_KEY_FILENAME: /tmp/oci_private_key.pem
+          OCI_REGION: ${{ secrets.OCI_REGION }}
+          OCI_SSH_PUBLIC_KEY: ${{ secrets.OCI_SSH_PUBLIC_KEY }}
+          OCI_SHAPE: ${{ env.OCI_SHAPE }}
+          OCI_OCPUS: ${{ env.OCI_OCPUS }}
+          OCI_MEMORY_IN_GBS: ${{ env.OCI_MEMORY_IN_GBS }}
+          OCI_SUBNET_ID: ${{ env.OCI_SUBNET_ID }}
+          OCI_IMAGE_ID: ${{ env.OCI_IMAGE_ID }}
+          OCI_AVAILABILITY_DOMAIN: ${{ env.OCI_AVAILABILITY_DOMAIN }}
+          OCI_DISPLAY_NAME: ${{ env.OCI_DISPLAY_NAME }}
